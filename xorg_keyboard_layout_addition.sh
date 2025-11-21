@@ -28,17 +28,14 @@ read country_list_ref
 echo "Enter the language list reference for the layout (ex: eng, fra, deu):"
 read language_list_ref
 
-
-echo "local_path $local_path"
 # Setting the folder for the files
 files_path=$local_path
 if [ "$choice" == "2" ]; then
-  files_path=$local_path
+  files_path=$user_path
 fi
 if [ "$choice" == "3" ]; then
   files_path=$all_users_path
 fi
-echo "files_path $files_path"
 
 # Creating the containing folders
 mkdir -p $files_path/rules
