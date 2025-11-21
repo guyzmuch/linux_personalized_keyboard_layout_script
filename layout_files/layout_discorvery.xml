@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xkbConfigRegistry SYSTEM "xkb.dtd">
+<xkbConfigRegistry version="1.1">
+  <layoutList>
+    <layout>
+      <configItem>
+        <name><layout_name></name>
+        <shortDescription><layout_name></shortDescription>
+        <description><layout_name></description>
+        <countryList>
+          <iso3166Id><layout_country_list></iso3166Id>
+        </countryList>
+        <languageList>
+          <iso639Id><layout_language_list></iso639Id>
+        </languageList>
+      </configItem>
+    </layout>
+  </layoutList>
+</xkbConfigRegistry>

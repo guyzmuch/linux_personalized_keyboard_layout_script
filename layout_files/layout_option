@@ -1,0 +1,4 @@
+! option   = symbols
+  <layout_name>:<layout_name>  = +<layout_name>(<layout_name>)
+
+! include %S/evdev
