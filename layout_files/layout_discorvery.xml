@@ -4,9 +4,9 @@
   <layoutList>
     <layout>
       <configItem>
-        <name><layout_name></name>
+        <name><layout_file_name></name>
         <shortDescription><layout_name></shortDescription>
-        <description><layout_name></description>
+        <description><layout_description></description>
         <countryList>
           <iso3166Id><layout_country_list></iso3166Id>
         </countryList>
