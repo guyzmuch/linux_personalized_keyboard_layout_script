@@ -1,0 +1,7 @@
+<layout>
+  <configItem>
+    <name><layout_file_name></name>
+    <shortDescription><layout_name></shortDescription>
+    <description><layout_description></description>
+  </configItem>
+</layout>

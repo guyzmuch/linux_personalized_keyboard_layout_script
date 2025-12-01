@@ -1,4 +1,4 @@
 xkb_symbols "<layout_name>" {
-	name[Group1]= "<layout_name>";
+	name[Group1]= "<layout_description>";
 
 };

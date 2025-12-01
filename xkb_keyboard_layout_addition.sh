@@ -11,6 +11,7 @@ language_list_ref=
 # different path for the wayland setting
 local_path=xkb
 user_path=$HOME/.config/xkb/
+user_path_x11=$HOME/.config/xkb-manual/
 all_users_path=/etc/xkb/
 
 # "XDG_SESSION_TYPE" is the type of display server protocol in linux. It can be "wayland" or "x11"
@@ -32,8 +33,6 @@ if [[ -z "$XDG_SESSION_TYPE" && "$EUID" -eq 0 ]]; then
   echo "   \"sudo XDG_SESSION_TYPE=<previous_value> ...\""
   exit 1
 fi
-
-
 
 # user variable filled by the user
 layout_name=
@@ -100,6 +99,7 @@ if [[ "$xdg_type" == "wayland" ]]; then
 
   # Copying the files and inserting layout name
   sed -e "s/<layout_name>/${layout_name}/g" \
+      -e "s/<layout_description>/${layout_description}/g" \
       layout_files/layout_mapping.xkb > $files_path/symbols/$layout_file_name
   sed -e "s/<layout_name>/${layout_name}/g" \
       -e "s/<layout_file_name>/${layout_file_name}/g" \
@@ -129,6 +129,72 @@ fi
 # - Create a mapping file in the system folder and modify a xkb configuration. This touch some configuration, that could be dangerous, and the setting might reset on some OS update
 if [[ "$xdg_type" == "x11" ]]; then
   echo "CREATING KEYBOARD LAYOUT FOR X11..."
+
+    # Where to save the layout
+  echo "Do you want the layout to be:"
+  echo "1: Prepare in this repo for later copy"
+  echo "2: Prepare for the current user"
+  read choice
+
+  if [[ ("$choice" != "1") && ("$choice" != "2") ]]; then
+    echo "Invalid choice. Exiting"
+    exit 1
+  fi
+
+  getLayoutInfo
+
+  # Setting the folder for the files
+  files_path=$local_path
+  if [ "$choice" == "2" ]; then
+    files_path=$user_path_x11
+  fi
+
+  # Copying the files and inserting layout name
+  sed -e "s/<layout_name>/${layout_name}/g" \
+      -e "s/<layout_description>/${layout_description}/g" \
+      layout_files/layout_mapping.xkb > $files_path/symbols/$layout_file_name
+  sed -e "s/<layout_name>/${layout_name}/g" \
+      -e "s/<layout_file_name>/${layout_file_name}/g" \
+      -e "s/<layout_description>/${layout_description}/g" \
+      layout_files/layout_discorvery_light.xml > $files_path/rules/evdev.xml
+
+
+  # display some information in regards to x11 set up
+  if [ "$choice" == "2" ]; then
+    echo ""
+    echo "Unfortunatly x11 does not suport having config file in the user configuration"
+    echo "You have 2 choices for setting up the layout (please read the README.md>#x11 options for more info)"
+    echo "1: Manually set the layout each time"
+    echo "2: Change system file for set up"
+    read x11_set_up
+
+    if [[ ("$x11_set_up" != "1") && ("$x11_set_up" != "2") ]]; then
+      echo "Invalid choice. Exiting"
+      exit 1
+    fi
+
+    # For manual set up, we need to run a command to load the layout each time (we could add this command at start up)
+    if [[ "$x11_set_up" == "1" ]]; then
+      echo "Run the following command to set up the layout everytime you want it."
+      echo "'xkbcli compile-keymap --include \$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \$DISPLAY 2>/dev/null'"
+      echo ""
+      echo "If you want to have it set up as at start up, add this line to the \"~/.xprofile\" file of your user"
+      echo "'echo (xkbcli compile-keymap --include \$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \$DISPLAY 2>/dev/null) >> \$HOME/.xprofile"
+    fi
+
+    # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 
+    if [[ "$x11_set_up" == "2" ]]; then
+      echo "Copying the layout mapping file to the system..."
+      cp $files_path/symbols/$layout_file_name $all_users_path/symbols/$layout_file_name
+      echo "You need to manually add the layout to the $all_users_path/rules/evdev.xml"
+      echo "Copy the content of $files_path/rules/evdev.xml into $all_users_path/rules/evdev.xml within the \"layoutList\" tag (see example in the read me)"
+      echo "Here is the content to copy"
+      cat $files_path/rules/evdev.xml
+      echo "/!\WARNING: Carefully copy the content, as mistake here might have consequences (maybe even break the OS)"
+      echo "You might need to restart you session ater those changes."
+      echo "The layout should be available as an option for your layout keyboard (even via the GUI of your OS)"
+    fi
+  fi
 
   # Exit the script to prevent following code to run
   exit
