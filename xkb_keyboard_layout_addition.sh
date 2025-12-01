@@ -149,6 +149,10 @@ if [[ "$xdg_type" == "x11" ]]; then
     files_path=$user_path_x11
   fi
 
+  # Creating the containing folders
+  mkdir -p $files_path/rules
+  mkdir -p $files_path/symbols
+
   # Copying the files and inserting layout name
   sed -e "s/<layout_name>/${layout_name}/g" \
       -e "s/<layout_description>/${layout_description}/g" \
@@ -173,13 +177,13 @@ if [[ "$xdg_type" == "x11" ]]; then
       exit 1
     fi
 
-    # For manual set up, we need to run a command to load the layout each time (we could add this command at start up)
+    # For manual set up, we need to run a command to load the layout each time
     if [[ "$x11_set_up" == "1" ]]; then
       echo "Run the following command to set up the layout everytime you want it."
       echo "'xkbcli compile-keymap --include \$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \$DISPLAY 2>/dev/null'"
       echo ""
-      echo "If you want to have it set up as at start up, add this line to the \"~/.xprofile\" file of your user"
-      echo "'echo (xkbcli compile-keymap --include \$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \$DISPLAY 2>/dev/null) >> \$HOME/.xprofile"
+      echo "If you want you can set up an alias for the command by adding it to \"~/.bashrc\" file of your user"
+      echo "'echo \"alias load_layout='xkbcli compile-keymap --include \\\$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \\\$DISPLAY 2>/dev/null'\" >> \$HOME/.bashrc'"
     fi
 
     # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 
