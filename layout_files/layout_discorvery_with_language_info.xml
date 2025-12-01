@@ -7,6 +7,12 @@
         <name><layout_file_name></name>
         <shortDescription><layout_name></shortDescription>
         <description><layout_description></description>
+        <countryList>\
+          <iso3166Id><layout_country_list></iso3166Id>\
+        </countryList>  
+        <languageList>
+          <iso639Id><layout_language_list></iso639Id>
+        </languageList>
       </configItem>
     </layout>
   </layoutList>

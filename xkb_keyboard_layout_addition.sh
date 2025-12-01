@@ -3,6 +3,10 @@
 # HERE YOU CAN MANUALLY SET SOME INFO FOR THE LAYOUT (if left empty, they will be replaced with "layout_name")
 layout_file_name=""
 layout_description=""
+# From my experience, adding the country and language reference does not work (does not place the layout in the correct language), so this is optional
+# Both values need to be set to be active
+country_list_ref=
+language_list_ref=
 
 # different path for the wayland setting
 local_path=xkb
@@ -12,24 +16,14 @@ all_users_path=/etc/xkb/
 # "XDG_SESSION_TYPE" is the type of display server protocol in linux. It can be "wayland" or "x11"
 xdg_type=$XDG_SESSION_TYPE
 
-# user valiable filled by the user
+# user variable filled by the user
 layout_name=
-country_list_ref=
-language_list_ref=
 
 # function asking information to the user in regards to the layout and fill the correct variable
 getLayoutInfo() {
   # Requesting the layout name
   echo "Enter your layout name:"
   read layout_name
-
-  # Requesting the country list reference
-  echo "Enter the country list reference for the layout (ex: US, FR, DE):"
-  read country_list_ref
-
-  # Requesting the language list reference
-  echo "Enter the language list reference for the layout (ex: eng, fra, deu):"
-  read language_list_ref
 
   # if no specific file name is defined, we use the layout name
   if [ -z "$layout_file_name" ]; then
@@ -74,11 +68,25 @@ if [[ "$xdg_type" == "wayland" ]]; then
   mkdir -p $files_path/rules
   mkdir -p $files_path/symbols
 
-  # Copying the files and inserting layout name
-  sed "s/<layout_name>/${layout_name}/g" layout_files/layout_mapping.xkb > $files_path/symbols/$layout_file_name
-  sed "s/<layout_name>/${layout_name}/g" layout_files/layout_option | sed "s/<layout_file_name>/${layout_file_name}/g" > $files_path/rules/evdev
-  sed "s/<layout_name>/${layout_name}/g" layout_files/layout_discorvery.xml | sed "s/<layout_file_name>/${layout_file_name}/g" | sed "s/<layout_description>/${layout_description}/g" | sed "s/<layout_country_list>/${country_list_ref}/g"  | sed "s/<layout_language_list>/${language_list_ref}/g" > $files_path/rules/evdev.xml
+  # determine the layout discovery file template to use
+  layout_discovery_template_file="layout_discorvery"
+  if [[ -n "$country_list_ref" && -n "$language_list_ref" ]]; then
+    layout_discovery_template_file="layout_discorvery_with_language_info"
+  fi
 
+  # Copying the files and inserting layout name
+  sed -e "s/<layout_name>/${layout_name}/g" \
+      layout_files/layout_mapping.xkb > $files_path/symbols/$layout_file_name
+  sed -e "s/<layout_name>/${layout_name}/g" \
+      -e "s/<layout_file_name>/${layout_file_name}/g" \
+      layout_files/layout_option > $files_path/rules/evdev
+  sed -e "s/<layout_name>/${layout_name}/g" \
+      -e "s/<layout_file_name>/${layout_file_name}/g" \
+      -e "s/<layout_description>/${layout_description}/g" \
+      -e "s/<layout_country_list>/${country_list_ref}/g" \
+      -e "s/<layout_language_list>/${language_list_ref}/g" \
+      layout_files/$layout_discovery_template_file.xml > $files_path/rules/evdev.xml
+  
   # Report on the file saved
   echo ""
   echo "The folder containing the configuration file for the layout have been saved in \"$files_path\""
