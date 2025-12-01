@@ -16,6 +16,25 @@ all_users_path=/etc/xkb/
 # "XDG_SESSION_TYPE" is the type of display server protocol in linux. It can be "wayland" or "x11"
 xdg_type=$XDG_SESSION_TYPE
 
+# If the script is run as root, by default "XDG_SESSION_TYPE" is not defined
+# So you can pass the "-E" option to preserve the environment variable from the original user
+# Or you can set up the variable manually when running the command
+if [[ -z "$XDG_SESSION_TYPE" && "$EUID" -eq 0 ]]; then
+  echo ""
+  echo "Root user as no XDG_SESSION_TYPE environment variable set"
+  echo "1. Less secure: You can either relaunch the command with the '-E' option of sudo set, to preserve the environment variable."
+  echo "   \"sudo -E ...\""
+  echo "2. For better security, you first set the user value of the variable, and set it for the command"
+  echo "   \"user_session_type=$(echo \$XDG_SESSION_TYPE)\""
+  echo "   \"sudo XDG_SESSION_TYPE=\$user_session_type ...\""
+  echo "3. For better security, you first echo the user value of the variable, then manually set it up for the command"
+  echo "   \"echo \$XDG_SESSION_TYPE\""
+  echo "   \"sudo XDG_SESSION_TYPE=<previous_value> ...\""
+  exit 1
+fi
+
+
+
 # user variable filled by the user
 layout_name=
 
@@ -61,6 +80,11 @@ if [[ "$xdg_type" == "wayland" ]]; then
     files_path=$user_path
   fi
   if [ "$choice" == "3" ]; then
+    # To set the layout for all users, you need to run the script as root
+    if [ $EUID -ne 0 ]; then
+        echo "To set the layout for all users, you need to run the script as root."
+        exit 1
+    fi
     files_path=$all_users_path
   fi
 
