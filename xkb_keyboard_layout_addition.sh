@@ -167,7 +167,7 @@ if [[ "$xdg_type" == "x11" ]]; then
   if [ "$choice" == "2" ]; then
     echo ""
     echo "Unfortunatly x11 does not suport having config file in the user configuration"
-    echo "You have 2 choices for setting up the layout (please read the README.md>#x11 options for more info)"
+    echo "You have 2 choices for setting up the layout (please read the 'README.md>#x11 options' for more info)"
     echo "1: Manually set the layout each time"
     echo "2: Change system file for set up"
     read x11_set_up
@@ -188,8 +188,15 @@ if [[ "$xdg_type" == "x11" ]]; then
 
     # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 
     if [[ "$x11_set_up" == "2" ]]; then
-      echo "Copying the layout mapping file to the system..."
-      cp $files_path/symbols/$layout_file_name $all_users_path/symbols/$layout_file_name
+      # To set the layout for all users, you need to run the script as root
+      if [ $EUID -ne 0 ]; then
+        echo "The script needs to be run as root to copy the layout mapping file."
+        echo "Either, re-run the script as root, or manually run the following command:"
+        echo "'cp $files_path/symbols/$layout_file_name $all_users_path/symbols/$layout_file_name'"
+      else 
+        echo "Copying the layout mapping file to the system..."
+        cp $files_path/symbols/$layout_file_name $all_users_path/symbols/$layout_file_name
+      fi
       echo "You need to manually add the layout to the $all_users_path/rules/evdev.xml"
       echo "Copy the content of $files_path/rules/evdev.xml into $all_users_path/rules/evdev.xml within the \"layoutList\" tag (see example in the read me)"
       echo "Here is the content to copy"
