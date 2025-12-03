@@ -131,13 +131,16 @@ fi
 if [[ "$xdg_type" == "x11" ]]; then
   echo "CREATING KEYBOARD LAYOUT FOR X11..."
 
-    # Where to save the layout
-  echo "Do you want the layout to be:"
+  # Where to save the layout
+  echo "Unfortunatly x11 does not suport having config file in the user configuration"
+  echo "You have 3 choices for setting up the layout (please read the 'README.md>#x11 options' for more info)"
+    
   echo "1: Prepare in this repo for later copy"
-  echo "2: Prepare for the users"
+  echo "2: Manually set the layout each time"
+  echo "3: Change system file for set up for all users"
   read choice
 
-  if [[ ("$choice" != "1") && ("$choice" != "2") ]]; then
+  if [[ ("$choice" != "1") && ("$choice" != "2")  && ("$choice" != "3") ]]; then
     echo "Invalid choice. Exiting"
     exit 1
   fi
@@ -146,7 +149,7 @@ if [[ "$xdg_type" == "x11" ]]; then
 
   # Setting the folder for the files
   files_path=$local_path
-  if [ "$choice" == "2" ]; then
+  if [ "$choice" != "1" ]; then
     files_path=$user_path_x11
   fi
 
@@ -163,50 +166,41 @@ if [[ "$xdg_type" == "x11" ]]; then
       -e "s/<layout_description>/${layout_description}/g" \
       layout_files/layout_discorvery_light.xml > $files_path/rules/evdev.xml
 
-
-  # display some information in regards to x11 set up
-  if [ "$choice" == "2" ]; then
+  # For file preparation, just mention where the file are saved
+  if [[ "$choice" == "1" ]]; then
+    # Report on the file saved
     echo ""
-    echo "Unfortunatly x11 does not suport having config file in the user configuration"
-    echo "You have 2 choices for setting up the layout (please read the 'README.md>#x11 options' for more info)"
-    echo "1: Manually set the layout each time"
-    echo "2: Change system file for set up"
-    read x11_set_up
+    echo "The folder containing the configuration file for the layout have been saved in \"$files_path\""
+  fi
+  
+  # For manual set up, we need to run a command to load the layout each time
+  if [[ "$choice" == "2" ]]; then
+    echo "Run the following command to set up the layout everytime you want it."
+    echo "'xkbcli compile-keymap --include \$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \$DISPLAY 2>/dev/null'"
+    echo ""
+    echo "If you want you can set up an alias for the command by adding it to \"~/.bashrc\" file of your user with the following command:"
+    echo "'echo \"alias load_layout='xkbcli compile-keymap --include \\\$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \\\$DISPLAY 2>/dev/null'\" >> \$HOME/.bashrc'"
+  fi
 
-    if [[ ("$x11_set_up" != "1") && ("$x11_set_up" != "2") ]]; then
-      echo "Invalid choice. Exiting"
-      exit 1
-    fi
-
-    # For manual set up, we need to run a command to load the layout each time
-    if [[ "$x11_set_up" == "1" ]]; then
-      echo "Run the following command to set up the layout everytime you want it."
-      echo "'xkbcli compile-keymap --include \$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \$DISPLAY 2>/dev/null'"
+  # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 
+  if [[ "$choice" == "3" ]]; then
+    # To set the layout for all users, you need to run the script as root
+    if [ $EUID -ne 0 ]; then
       echo ""
-      echo "If you want you can set up an alias for the command by adding it to \"~/.bashrc\" file of your user"
-      echo "'echo \"alias load_layout='xkbcli compile-keymap --include \\\$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \\\$DISPLAY 2>/dev/null'\" >> \$HOME/.bashrc'"
+      echo "The script needs to be run as root to copy the layout mapping file."
+      echo "Either, re-run the script as root, or manually run the following command to copy the file:"
+      echo "'sudo cp $files_path/symbols/$layout_file_name $xkb_system_path/symbols/$layout_file_name'"
+    else 
+      echo "Copying the layout mapping file to the system..."
+      cp $files_path/symbols/$layout_file_name $xkb_system_path/symbols/$layout_file_name
     fi
-
-    # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 
-    if [[ "$x11_set_up" == "2" ]]; then
-      # To set the layout for all users, you need to run the script as root
-      if [ $EUID -ne 0 ]; then
-        echo ""
-        echo "The script needs to be run as root to copy the layout mapping file."
-        echo "Either, re-run the script as root, or manually run the following command:"
-        echo "'cp $files_path/symbols/$layout_file_name $xkb_system_path/symbols/$layout_file_name'"
-      else 
-        echo "Copying the layout mapping file to the system..."
-        cp $files_path/symbols/$layout_file_name $xkb_system_path/symbols/$layout_file_name
-      fi
-      echo "You need to manually add the layout to the $xkb_system_path/rules/evdev.xml"
-      echo "Insert the content of $files_path/rules/evdev.xml into $xkb_system_path/rules/evdev.xml within the \"layoutList\" tag (see example in the read me)"
-      echo "Here is the content to copy"
-      cat $files_path/rules/evdev.xml
-      echo "/!\WARNING: Carefully copy the content, as mistake here might have consequences (maybe even break the OS)"
-      echo "You might need to restart you session ater those changes."
-      echo "The layout should be available as an option for your layout keyboard (even via the GUI of your OS)"
-    fi
+    echo "You need to manually add the layout to the $xkb_system_path/rules/evdev.xml"
+    echo "Insert the content of $files_path/rules/evdev.xml into $xkb_system_path/rules/evdev.xml within the \"layoutList\" tag (see example in the read me)"
+    echo "Here is the content to copy"
+    cat $files_path/rules/evdev.xml
+    echo "/!\WARNING: Carefully copy the content, as mistake here might have consequences (maybe even break the OS)"
+    echo "You might need to restart you session after those changes."
+    echo "The layout should be available as an option for your layout keyboard (even via the GUI of your OS)"
   fi
 
   # Exit the script to prevent following code to run
