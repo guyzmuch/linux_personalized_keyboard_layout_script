@@ -10,9 +10,10 @@ language_list_ref=
 
 # different path for the wayland setting
 local_path=xkb
-user_path=$HOME/.config/xkb/
-user_path_x11=$HOME/.config/xkb-manual/
-all_users_path=/etc/xkb/
+user_path=$HOME/.config/xkb
+user_path_x11=$HOME/.config/xkb-manual
+all_users_path=/etc/xkb
+xkb_system_path=/usr/share/X11/xkb
 
 # "XDG_SESSION_TYPE" is the type of display server protocol in linux. It can be "wayland" or "x11"
 xdg_type=$XDG_SESSION_TYPE
@@ -133,7 +134,7 @@ if [[ "$xdg_type" == "x11" ]]; then
     # Where to save the layout
   echo "Do you want the layout to be:"
   echo "1: Prepare in this repo for later copy"
-  echo "2: Prepare for the current user"
+  echo "2: Prepare for the users"
   read choice
 
   if [[ ("$choice" != "1") && ("$choice" != "2") ]]; then
@@ -190,15 +191,16 @@ if [[ "$xdg_type" == "x11" ]]; then
     if [[ "$x11_set_up" == "2" ]]; then
       # To set the layout for all users, you need to run the script as root
       if [ $EUID -ne 0 ]; then
+        echo ""
         echo "The script needs to be run as root to copy the layout mapping file."
         echo "Either, re-run the script as root, or manually run the following command:"
-        echo "'cp $files_path/symbols/$layout_file_name $all_users_path/symbols/$layout_file_name'"
+        echo "'cp $files_path/symbols/$layout_file_name $xkb_system_path/symbols/$layout_file_name'"
       else 
         echo "Copying the layout mapping file to the system..."
-        cp $files_path/symbols/$layout_file_name $all_users_path/symbols/$layout_file_name
+        cp $files_path/symbols/$layout_file_name $xkb_system_path/symbols/$layout_file_name
       fi
-      echo "You need to manually add the layout to the $all_users_path/rules/evdev.xml"
-      echo "Copy the content of $files_path/rules/evdev.xml into $all_users_path/rules/evdev.xml within the \"layoutList\" tag (see example in the read me)"
+      echo "You need to manually add the layout to the $xkb_system_path/rules/evdev.xml"
+      echo "Insert the content of $files_path/rules/evdev.xml into $xkb_system_path/rules/evdev.xml within the \"layoutList\" tag (see example in the read me)"
       echo "Here is the content to copy"
       cat $files_path/rules/evdev.xml
       echo "/!\WARNING: Carefully copy the content, as mistake here might have consequences (maybe even break the OS)"
