@@ -41,8 +41,7 @@ layout_name=
 # function asking information to the user in regards to the layout and fill the correct variable
 getLayoutInfo() {
   # Requesting the layout name
-  echo "Enter your layout name:"
-  read layout_name
+  read -p "Enter your layout name: " layout_name
 
   # if no specific file name is defined, we use the layout name
   if [ -z "$layout_file_name" ]; then
@@ -65,7 +64,8 @@ if [[ "$xdg_type" == "wayland" ]]; then
   echo "1: Prepare in this repo for later copy"
   echo "2: Set for the current user"
   echo "3: Set for all users (need to run as root)"
-  read choice
+  read -p "Your choice: " -n 1 choice
+  echo "" # needed to have a line break after the read
 
   if [[ ("$choice" != "1") && ("$choice" != "2") && ("$choice" != "3") ]]; then
     echo "Invalid choice. Exiting"
@@ -138,7 +138,8 @@ if [[ "$xdg_type" == "x11" ]]; then
   echo "1: Prepare in this repo for later copy"
   echo "2: Manually set the layout each time"
   echo "3: Change system file for set up for all users"
-  read choice
+  read -p "Your choice: " -n 1 choice
+  echo "" # needed to have a line break after the read
 
   if [[ ("$choice" != "1") && ("$choice" != "2")  && ("$choice" != "3") ]]; then
     echo "Invalid choice. Exiting"
