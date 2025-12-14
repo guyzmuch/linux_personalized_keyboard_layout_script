@@ -1,0 +1,12 @@
+xkb_symbols "<layout_name>" {
+	name[Group1]= "<layout_description>";
+
+	include "fr(bepo_afnor)"
+
+	key <AE02> { type[group1] = "FOUR_LEVEL_SEMIALPHABETIC", [ less, 2, guillemotleft, leftdoublequotemark ] }; // < 2 « “
+	key <AE03> { type[group1] = "FOUR_LEVEL_SEMIALPHABETIC", [ greater, 3, guillemotright, rightdoublequotemark ] }; // > 3 » ”
+	key <AC05> { type[group1] = "FOUR_LEVEL", [ comma, semicolon, rightsinglequotemark, dead_belowcomma ] }; // , ; ’ ,
+	key <AB04> { type[group1] = "FOUR_LEVEL", [ period, colon, periodcentered, ellipsis ] }; // . : · …
+	key <AB06> { type[group1] = "FOUR_LEVEL", [ apostrophe, question, questiondown, dead_hook ] }; // ' ? ¿  ̉
+	key <SPCE> { type[group1] = "FOUR_LEVEL", [ space, U202F, underscore, space ] }; //     _ 
+};
