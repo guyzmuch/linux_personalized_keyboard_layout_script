@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # HERE YOU CAN MANUALLY SET SOME INFO FOR THE LAYOUT (if left empty, they will be replaced with "layout_name")
-layout_file_name=""
-layout_description=""
+layout_file_name=
+layout_description=
 # From my experience, adding the country and language reference does not work (does not place the layout in the correct language), so this is optional
 # Both values need to be set to be active
 country_list_ref=
@@ -44,11 +44,11 @@ getLayoutInfo() {
   read -p "Enter your layout name: " layout_name
 
   # if no specific file name is defined, we use the layout name
-  if [ -z "$layout_file_name" ]; then
+  if [[ -z "$layout_file_name" ]]; then
     layout_file_name="$layout_name"
   fi
   # if no specific description is defined, we use the layout name
-  if [ -z "$layout_description" ]; then
+  if [[ -z "$layout_description" ]]; then
     layout_description="$layout_name"
   fi
 }
@@ -72,21 +72,21 @@ if [[ "$xdg_type" == "wayland" ]]; then
     exit 1
   fi
 
-  getLayoutInfo
-
   # Setting the folder for the files
   files_path=$local_path
-  if [ "$choice" == "2" ]; then
+  if [[ "$choice" == "2" ]]; then
     files_path=$user_path
   fi
-  if [ "$choice" == "3" ]; then
+  if [[ "$choice" == "3" ]]; then
     # To set the layout for all users, you need to run the script as root
-    if [ $EUID -ne 0 ]; then
+    if [[ $EUID -ne 0 ]]; then
         echo "To set the layout for all users, you need to run the script as root."
         exit 1
     fi
     files_path=$all_users_path
   fi
+
+  getLayoutInfo
 
   # Creating the containing folders
   mkdir -p $files_path/rules
@@ -116,7 +116,7 @@ if [[ "$xdg_type" == "wayland" ]]; then
   echo ""
   echo "The folder containing the configuration file for the layout have been saved in \"$files_path\""
   # echo "The folder containing the configuration file for the layout have been saved in $file_path"
-  if [ "$choice" != '1' ]; then
+  if [[ "$choice" != '1' ]]; then
     echo "You might need to restart you session to see the changes."
     echo "The layout should be available as an option for your layout keyboard (even via the GUI of your OS)"
   fi
@@ -150,7 +150,7 @@ if [[ "$xdg_type" == "x11" ]]; then
 
   # Setting the folder for the files
   files_path=$local_path
-  if [ "$choice" != "1" ]; then
+  if [[ "$choice" != "1" ]]; then
     files_path=$user_path_x11
   fi
 
@@ -186,7 +186,7 @@ if [[ "$xdg_type" == "x11" ]]; then
   # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 
   if [[ "$choice" == "3" ]]; then
     # To set the layout for all users, you need to run the script as root
-    if [ $EUID -ne 0 ]; then
+    if [[ $EUID -ne 0 ]]; then
       echo ""
       echo "The script needs to be run as root to copy the layout mapping file."
       echo "Either, re-run the script as root, or manually run the following command to copy the file:"
