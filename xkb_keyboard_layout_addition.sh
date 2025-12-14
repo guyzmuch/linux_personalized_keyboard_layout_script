@@ -181,6 +181,8 @@ if [[ "$xdg_type" == "x11" ]]; then
     echo ""
     echo "If you want you can set up an alias for the command by adding it to \"~/.bashrc\" file of your user with the following command:"
     echo "'echo \"alias load_layout='xkbcli compile-keymap --include \\\$HOME/.config/xkb-manual/ --include-defaults --layout ${layout_file_name} | xkbcomp - \\\$DISPLAY 2>/dev/null'\" >> \$HOME/.bashrc'"
+    echo ""
+    echo "To use the layout, run the 'load_layout' in a bash shell terminal"
   fi
 
   # For system set up, we need to copy the mapping to the system file, and manually add the info to the system evdev.xml file 

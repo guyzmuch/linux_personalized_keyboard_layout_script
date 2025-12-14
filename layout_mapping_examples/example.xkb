@@ -1,0 +1,9 @@
+xkb_symbols "<layout_name>" {
+	name[Group1]= "<layout_description>";
+
+	// Based on the us layout, inverting the letter "a" and "q"
+	include "us(basic)"
+
+  key <AD01>	{[	 a,	 A		]}; // original: key <AD01>	{[	 q,	 Q		]};
+  key <AC01>	{[	 q,	 Q		]}; // original: key <AC01>	{[	 a,	 A		]};
+};
