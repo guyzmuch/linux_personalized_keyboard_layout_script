@@ -54,3 +54,37 @@ The custom layout won't appear as a specific language layout in the system (aka 
 Depending on the option, the script will only work if you have a single custom layout setup, as the same file might be overwritten.  
 The solution to have multiple custom layout will not be detailled thoroughly in here, but you can rename some generated folder to not have the same name (working for the X11 second option, but you will need to update the command). Or you might need to update the "evdev" and "evdev.xml" generated file to include all the different custom layout (wayland case 2 and 3).
 
+## Script variables
+The script is working by default without options, but if you want to customize the result a bit, you can open the script file and fill up 4 variables
+- **layout_file_name**: You can enter a value here to specify a name for the mapping file, so the name of the file that will be written in the system. (default will be the layout name entered during the script process)
+- **layout_description**: The description is what is going to be displayed on the GUI for the layout. (default will be the layout name entered during the script process)
+- **country_list_ref**: The country reference the apartnence of the layout. (default will omit this information in the evdev.xml file)
+- **language_list_ref**: The country reference the apartnence of the layout. (default will omit this information in the evdev.xml file)
+
+
+In my test, country and language information had no influence in the result (aka the layout does not appear for the country or language, or does not display the flag on the GUI), and so there are not filled by default
+
+## Personal though on the project
+I needed to have something like that for myself, and I didn't encounter good information on how to do it, this is the reason of this script. And I am a bit sad that I was not able to make it work better.  
+Working on this project made me study how wayland and X11 load layout file, and explore this world. Including learning the **libxkbcommon** library. But it is a complex world for me, and so there are lots of hole in my knowledge of how things works.  
+As a result of that, there might be better way to set up a keyboard layout on a linux operating system that I don't know.  
+
+But the goal of this script is to make the process easy, without reading documentatino and working directly independently of the display server
+
+### **Important**  
+I have work this script for myself, using linux mint as operating system. I tested is for my own use case in different operating system using VM, and so, even though I tried to make it generic, you might encounter some problem. So please let me know if you do so, so I can try to improve the script.  
+Also, let me know if you see way to improve the script.
+
+## Tested distro
+I tried to test the different options of the script in different distros (both using wayland and X11) to see if it was behaving correctly.  
+I have launch test those in VM on newly installed operating system.  
+I have tested on the following distro:
+- ubuntu (wayland)
+- manjaro (X11)
+- linux mint (X11)
+
+## Sources
+To arrive to this result, I started with the use of AI, but it brought me to non working solution.  
+So here are some resources that help me created this script:
+- [custom keyboard layouts with xkb by codeaffen.org](https://codeaffen.org/2023/09/16/custom-keyboard-layouts-with-xkb/): this is a great article that unlock the subject for me, and help me figure a lot out (even though it describe the process for wayland)
+- the [libxkbcommon](https://xkbcommon.org/doc/current/index.html) library website was a great resource to go deeper into the working of the keyboard layout configuration and also explain some of the command to run for certain cases
